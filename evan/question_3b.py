@@ -46,8 +46,9 @@ if __name__ == "__main__" :
    words = "mom dad sister son daughter mom"
    c = count( words )
    print "String is %s" % words
-   for k,v in c :
-      print k,v
+   for k in c.keys() :
+      print k,c[k]
+   
 
 
 
