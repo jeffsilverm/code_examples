@@ -49,9 +49,13 @@ if max_n < 285 :
 nt = 0
 np = 0
 nh = 0
+# These variables have to be initialized because they will be referenced before
+# they are assigned otherwise.  Furthermore, they have to initialized to
+# different values, because they will be tested for equality and those tests
+# should fail before good values are found.
 p = -1
-t = -1
-h = -1
+t = -2
+h = -3
 t_d = {}
 p_d = {}
 h_d = {}
@@ -66,27 +70,36 @@ for nt in range(1, 287) :   # for test
     if nt in t_d :
         t = t_d[nt]
 #        for nh in range(1, max_n) :   # for production
-        for nt in range(1,146) :  # for test
+        for nh in range(1,146) :  # for test
             if nh in h_d :
                 h = h_d[ nh ]
                 if t == h :
                     print ("Remarkably, triangular number %d = T(%d) equals \
 %d = H(%d)" % (t,nt, h, nt ))
                     for np in range(nt, nh):
-                        p = p_d[ np ]
+                        if np in p_d :
+                            p = p_d[ np ]
 # The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal and a hexagonal
-                        if ( nt == 285 and np == 165 and nh == 143 and
-                        ( p != 40755 or h != 40755 or t != 40755 ) ):
-                            raise AssertionError("The test values nt==285, np == 165, nh == 143 \
+                            if ( nt == 285 and np == 165 and nh == 143 and
+                            ( p != 40755 or h != 40755 or t != 40755 ) ):
+                                raise AssertionError("The test values nt==285, np == 165, nh == 143 \
 do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
 # The only way to get here is if h == t
-                        if p == h :
-                            print ("***** You found it! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
+                            if p == h :
+                                print ("***** You found it! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
                                    % (t,nt, p, pn, h, hn))
-                            break
-            if p == h :
+                                break
+                        else :
+                            p = -1   # np is not a pentagonal number so p reverts
+                else :
+                    h = -3   # nh is not a hexagonal number so h reverts
+    else :
+        t = -2     # nt is not a triangular number, so t reverts
+# I'd like break out of two loops at this point.  The following two tests will
+# will break out
+            if p == h and h == t :
                 break
-    if p == t :
+    if p == t and p == h :
         break
 assert ( p == t and p == h ), "There is a bug in the software: t, p, h not equal! %d != %d != %d" %\
     ( t, p, h)
