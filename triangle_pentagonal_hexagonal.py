@@ -18,11 +18,11 @@ def tn( n ):
 
 def pn( n ):
     """Returns the nth pentagonal number"""
-    return n(3n-1)/2
+    return n*(3*n-1)/2
 
 def hn( n ):
     """Returns the nth hexagonal number"""
-    return n(2n-1)
+    return n*(2*n-1)
 
 # Now, are there some numbers n1, n2, and n3 such that
 # tn ( n1 ) == pn( n2) == hn( n3 )
@@ -38,11 +38,13 @@ def hn( n ):
 # The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal
 # number, and a hexagonal number. Write code to find the next number like this.
 #
-if len(sys.argv) != 1 :
+if len(sys.argv) != 2 :
     raise ValueError("This program takes exactly 1 argument, the maximum number iterations")
-max_n = int(sys.argv[0])
-if max_n <= 0 :
-    raise ValueError("The number of iterations should be a counting number")
+max_n = int(sys.argv[1])
+if max_n < 285 :
+    raise ValueError("The number of iterations should be a counting number larger than 285")
+ 
+    
 
 nt = 0
 np = 0
@@ -54,39 +56,39 @@ t_d = {}
 p_d = {}
 h_d = {}
 
-for n in range(max_n):
+for n in range(1, max_n):
     t_d[ tn( n ) ] = n
     p_d[ pn( n ) ] = n
     h_d[ hn( n ) ] = n
 
-# while nt < max_n :  # for production
-while nt < 287 :
+# for nt in range(1, max_n) :  # for production
+for nt in range(1, 287) :   # for test
     if nt in t_d :
         t = t_d[nt]
-#        while nh < max_n :
-        while nh < 146 :
+#        for nh in range(1, max_n) :   # for production
+        for nt in range(1,146) :  # for test
             if nh in h_d :
                 h = h_d[ nh ]
                 if t == h :
-                    print ("Remarkably, triangular number %d = T(%d) equals" % (t,nt)) +
-                    ( "%d = H(%d)" % (h,nh))
+                    print ("Remarkably, triangular number %d = T(%d) equals \
+%d = H(%d)" % (t,nt, h, nt ))
                     for np in range(nt, nh):
                         p = p_d[ np ]
 # The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal and a hexagonal
                         if ( nt == 285 and np == 165 and nh == 143 and
-                        ( p != 40744 or h != 40744 or t != 40744 ) ):
-                            raise AssertionError("The test values nt==285, np == 165, nh == 143 " +\
-                                                 "do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
+                        ( p != 40755 or h != 40755 or t != 40755 ) ):
+                            raise AssertionError("The test values nt==285, np == 165, nh == 143 \
+do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
 # The only way to get here is if h == t
                         if p == h :
-                            print ("***** You found it! " + "%d = T(%d) equals" % (t,nt)) +
-                    ( "%d = P(%d) equals %d = H(%d) ***** " % (t,nh,p,np))
+                            print ("***** You found it! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
+                                   % (t,nt, p, pn, h, hn))
                             break
             if p == h :
                 break
     if p == t :
         break
-assert ( p == t and p == h ), "There is a bug in the software: t, p, h not equal! %d != %d != %d" %
+assert ( p == t and p == h ), "There is a bug in the software: t, p, h not equal! %d != %d != %d" %\
     ( t, p, h)
 
 
