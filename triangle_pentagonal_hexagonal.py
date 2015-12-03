@@ -1,5 +1,17 @@
 #! /usr/bin/env python
 #
+# Hi Jeff,
+#
+# It was great connecting with you today!
+# 
+# As promised, I have included the Coding Exercise question. Here is the link:
+# https://gist.github.com/marndt/389c114200841ed0858c
+# I will keep an eye out for your answers and updated resume.
+# Let me know if you have any questions at all at this time.
+# Jason Ames
+# Recruiting Manager
+# CAPABILITY IT
+# main: 425.679.5762
 # Find a number that is simultaneously triangular, pentagonal and hexagonal.
 # This is fairly well known problem in number theory.
 #
@@ -11,6 +23,8 @@
 # pentagonal number, and a hexagonal number. Write code to find the next
 # number like this.
 import sys
+
+TEST = True
 
 def tn( n ):
     """Returns the nth triangular number"""
@@ -38,6 +52,25 @@ def hn( n ):
 # The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal
 # number, and a hexagonal number. Write code to find the next number like this.
 #
+if TEST :
+
+# This table is taken directly from the github page
+# Triangular	Tn = n(n+1)/2	1, 3, 6, 10, 15, ...
+# Pentagonal	Pn = n(3n-1)/2	1, 5, 12, 22, 35, ...
+# Hexagonal	Hn = n(2n-1)	1, 6, 15, 28, 45, ...
+    t_table = [0, 1, 3,  6, 10, 15 ]
+    p_table = [0, 1, 5, 12, 22, 35 ]
+    h_table = [0, 1, 6, 15, 28, 45 ]
+    for n in range(1,len(t_table)):
+        assert tn(n) == t_table[n], "Triangular function fails on %d,\
+returned %d should have returned %d" % ( n, tn(n), t_table[n])
+        assert pn(n) == p_table[n], "Pentagonal function fails on %d,\
+returned %d should have returned %d" % ( n, tn(n), p_table[n])
+        assert hn(n) == h_table[n], "Hexagonal function fails on %d,\
+returned %d should have returned %d" % ( n, tn(n), h_table[n])
+    print("All functions returned correct values for their tests")   
+
+
 if len(sys.argv) != 2 :
     raise ValueError("This program takes exactly 1 argument, the maximum number iterations")
 max_n = int(sys.argv[1])
@@ -75,21 +108,21 @@ for nt in range(1, 287) :   # for test
         for nh in range(1,146) :  # for test
             if nh in h_d :
                 h = h_d[ nh ]
-                if t == h :
+                if nh == nh :
                     print ("Remarkably, triangular number %d = T(%d) equals \
-%d = H(%d)" % (t,nt, h, nt ))
+%d = H(%d)" % (nt, t, nh, h ))
                     for np in range(nt, nh):
                         if np in p_d :
                             p = p_d[ np ]
-# The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal and a hexagonal
+# The number T285 = P165 = H143 =condemming 40755 is a triangular number, a pentagonal and a hexagonal
                             if ( nt == 285 and np == 165 and nh == 143 and
                             ( p != 40755 or h != 40755 or t != 40755 ) ):
                                 raise AssertionError("The test values nt==285, np == 165, nh == 143 \
 do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
 # The only way to get here is if h == t
-                            if p == h :
+                            if np == nh :
                                 print ("***** You found it! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
-                                   % (t,nt, p, np, h, nh))
+                                   % (nt, h, pn, p, hn, h))
                                 break
                         else :
                             p = -1   # np is not a pentagonal number so p reverts
