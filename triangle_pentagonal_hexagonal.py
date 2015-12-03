@@ -22,6 +22,15 @@
 # The number T285 = P165 = H143 = 40755 is a triangular number, a
 # pentagonal number, and a hexagonal number. Write code to find the next
 # number like this.
+#
+# Googling 40755 and hexagonal, pentagonal, and hexagonal reveals
+# that the next answer is 1,533,776,805
+# (http://www.mathblog.dk/project-euler-45-next-triangle-pentagonal-hexagonal-number/)
+#
+# Looking for the first number 40755, worked relatively well, returning an answer in
+# 0.145 seconds.  Looking for the second number, 1,533,776,805, was excruitingly
+# slow.  Looking at top, I see that the process has used 28GBytes of RAM and still growing.
+# Eventually, the out of memory (OOM) killer killed it.
 import sys
 
 TEST = True
@@ -77,18 +86,9 @@ max_n = int(sys.argv[1])
 if max_n <= 285 :
     raise ValueError("The indexes of the numbers should be larger than 285")
  
-    
 
-nt = 0
-np = 0
-nh = 0
-# These variables have to be initialized because they will be referenced before
-# they are assigned otherwise.  Furthermore, they have to initialized to
-# different values, because they will be tested for equality and those tests
-# should fail before good values are found.
-p = -1
-t = -2
-h = -3
+BIG_T = 40755    
+
 # implementation note: if time permits, investigate using a counter instead of
 # a dictionary.
 t_d = {}
@@ -115,51 +115,26 @@ assert h_d[28] == 4, "The directory h_d was not initialized properly: the 4th pe
 number is not 28, it is %d" % h_d[28]
 # The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal
 # number, and a hexagonal number.
-assert t_d[40755] == 285 and p_d[40755] == 165 and h_d[40755] == 143, \
-        "The test case in the problem statement failed. t_d[40755]=%d (should be 285), p_d[40755]=%d (should be 165)\
+assert t_d[BIG_T] == 285 and p_d[BIG_T] == 165 and h_d[BIG_T] == 143, \
+        "The test case in the problem statement failed. t_d[BIG_T]=%d (should be 285), p_d[40755]=%d (should be 165)\
 , h_d[40755]=%d (should be 143)" % \
-        (t_d[40755], p_d[40755], h_d[40755] )
+        (t_d[BIG_T], p_d[BIG_T], h_d[BIG_T] )
 
-# for nt in range(1, max_n) :  # for production  # This is wrong, it must be much larger
-for nt in range(1, 40755) :   # for test
-    if nt in t_d :
-        t = t_d[nt]
+for t in range(1, max_n+1) :
+    if t in t_d :    # is t a triangular number?
+        nt = t_d[t] # Yes, what is its index?
+        if t in h_d : # is t also a hexagonal number?
+            nh = h_d[t]         # yes, what is its index?
+            if t in p_d :       # is it also a pentagonal number ?
+                np = p_d[t]    # yes, what is its index ?
+# The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal and a hexagonal
+                if ( nt == 285 and np == 165 and nh == 143 and
+                ( t != BIG_T) ):
+                    raise AssertionError("The test values nt==285, np == 165, nh == 143 \
+do not yield 40755.  nt=%d np=%d nh=%d T=%d" % ( t_d[t], p_d[t], h_d[t], t))                    
+                print ("***** You found one! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
+                   % (t, nt, t, np, t, nh ))
 
-#        for nh in range(1, max_n) :   # for production
-        for nh in range(1,146) :  # for test
-            if nh in h_d :
-                h = h_d[ nh ]
-                if t == h :
-                    print ("Remarkably, triangular number %d = T(%d) equals \
-hexagonal number %d = H(%d)" % (t, nt, h, nh ))
-                    for np in range(nt, nh):
-                        if np in p_d :
-                            p = p_d[ np ]
-# The number T285 = P165 = H143 =condemming 40755 is a triangular number, a pentagonal and a hexagonal
-                            if ( nt == 285 and np == 165 and nh == 143 and
-                            ( p != 40755 or h != 40755 or t != 40755 ) ):
-                                raise AssertionError("The test values nt==285, np == 165, nh == 143 \
-do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
-# The only way to get here is if h == t
-                            if p == h :
-                                print ("***** You found it! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
-                                   % (t, nt, h, hn, p, pn, h, hn))
-                                break
-                        else :
-                            p = -1   # np is not a pentagonal number so p reverts
-                        if p == h and h == t :
-                            break    # the np loop
-            else :   # nh not in h_d
-                h = -3   # nh is not a hexagonal number so h reverts
-            if p == h and h == t :
-                break    # the nh loop   
-    else :
-        t = -2     # nt is not a triangular number, so t reverts            
-    if p == t and p == h :
-        break     # the nt loop
-assert ( p == t and p == h ), "There is a bug in the software: t, p, h not equal! %d != %d != %d" %\
-    ( t, p, h)
-print "The answer is %d = T(%d), %d = P(%d), %d = H(%d)" % (t, nt, p, np, h, nh )
 
 
 
