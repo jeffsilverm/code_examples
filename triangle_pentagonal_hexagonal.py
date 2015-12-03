@@ -56,6 +56,8 @@ nh = 0
 p = -1
 t = -2
 h = -3
+# implementation note: if time permits, investigate using a counter instead of
+# a dictionary.
 t_d = {}
 p_d = {}
 h_d = {}
@@ -87,20 +89,20 @@ do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
 # The only way to get here is if h == t
                             if p == h :
                                 print ("***** You found it! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
-                                   % (t,nt, p, pn, h, hn))
+                                   % (t,nt, p, np, h, nh))
                                 break
                         else :
                             p = -1   # np is not a pentagonal number so p reverts
-                else :
-                    h = -3   # nh is not a hexagonal number so h reverts
-    else :
-        t = -2     # nt is not a triangular number, so t reverts
-# I'd like break out of two loops at this point.  The following two tests will
-# will break out
+                        if p == h and h == t :
+                            break    # the np loop
+            else :   # nh not in h_d
+                h = -3   # nh is not a hexagonal number so h reverts
             if p == h and h == t :
-                break
+                break    # the nh loop   
+    else :
+        t = -2     # nt is not a triangular number, so t reverts            
     if p == t and p == h :
-        break
+        break     # the nt loop
 assert ( p == t and p == h ), "There is a bug in the software: t, p, h not equal! %d != %d != %d" %\
     ( t, p, h)
 
