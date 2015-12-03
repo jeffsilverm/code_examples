@@ -74,8 +74,8 @@ returned %d should have returned %d" % ( n, tn(n), h_table[n])
 if len(sys.argv) != 2 :
     raise ValueError("This program takes exactly 1 argument, the maximum number iterations")
 max_n = int(sys.argv[1])
-if max_n < 285 :
-    raise ValueError("The number of iterations should be a counting number larger than 285")
+if max_n <= 285 :
+    raise ValueError("The indexes of the numbers should be larger than 285")
  
     
 
@@ -95,22 +95,43 @@ t_d = {}
 p_d = {}
 h_d = {}
 
+# This is counter intuitive (at least to me). A number T is triangular if it in
+# dictionary t_d.  We're looking for the nth triangular number.  So, for example,
+# 6 is a triangular number.  We can tell by looking at t_d[6] that the 2nd triangular
+# is 6.  Searching for a key in a dictionary is very fast.
 for n in range(1, max_n):
     t_d[ tn( n ) ] = n
     p_d[ pn( n ) ] = n
     h_d[ hn( n ) ] = n
+# I am programming very defensively here to bolster my intuition that this is the right way
+# to solve the problem.  Maybe using a counter is not such a good idea: there must be a limit
+# on the number of key/value pairs you can have in a dictionary
+assert 4 not in t_d, "Your intuition is blown.  4 is not supposed to be in t_d"
+assert t_d[3] == 2, "The directory t_d was not initialized properly: the 2nd triangular \
+number is not 6 it is %d" % t_d[3]
+assert p_d[12] == 3, "The directory p_d was not initialized properly: the 3rd pentagonal \
+number is not 12, it is %d" % p_d[12]
+assert h_d[28] == 4, "The directory h_d was not initialized properly: the 4th pentagonal \
+number is not 28, it is %d" % h_d[28]
+# The number T285 = P165 = H143 = 40755 is a triangular number, a pentagonal
+# number, and a hexagonal number.
+assert t_d[40755] == 285 and p_d[40755] == 165 and h_d[40755] == 143, \
+        "The test case in the problem statement failed. t_d[40755]=%d (should be 285), p_d[40755]=%d (should be 165)\
+, h_d[40755]=%d (should be 143)" % \
+        (t_d[40755], p_d[40755], h_d[40755] )
 
-# for nt in range(1, max_n) :  # for production
-for nt in range(1, 287) :   # for test
+# for nt in range(1, max_n) :  # for production  # This is wrong, it must be much larger
+for nt in range(1, 40755) :   # for test
     if nt in t_d :
         t = t_d[nt]
+
 #        for nh in range(1, max_n) :   # for production
         for nh in range(1,146) :  # for test
             if nh in h_d :
                 h = h_d[ nh ]
-                if nh == nh :
+                if t == h :
                     print ("Remarkably, triangular number %d = T(%d) equals \
-%d = H(%d)" % (nt, t, nh, h ))
+hexagonal number %d = H(%d)" % (t, nt, h, nh ))
                     for np in range(nt, nh):
                         if np in p_d :
                             p = p_d[ np ]
@@ -120,9 +141,9 @@ for nt in range(1, 287) :   # for test
                                 raise AssertionError("The test values nt==285, np == 165, nh == 143 \
 do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
 # The only way to get here is if h == t
-                            if np == nh :
+                            if p == h :
                                 print ("***** You found it! %d = T(%d) equals %d = P(%d) equals %d = H(%d) ***** " \
-                                   % (nt, h, pn, p, hn, h))
+                                   % (t, nt, h, hn, p, pn, h, hn))
                                 break
                         else :
                             p = -1   # np is not a pentagonal number so p reverts
@@ -138,6 +159,8 @@ do not yield 40744.  T=%d P=%d H=%d" % ( t, p, h))
         break     # the nt loop
 assert ( p == t and p == h ), "There is a bug in the software: t, p, h not equal! %d != %d != %d" %\
     ( t, p, h)
+print "The answer is %d = T(%d), %d = P(%d), %d = H(%d)" % (t, nt, p, np, h, nh )
+
 
 
     
