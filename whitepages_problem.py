@@ -48,7 +48,10 @@ def mount ( device, fs_type, mountpoint, options ):
 with options."""
     raise NotImplemented
 
-
+def handle_symlink ( mountpoint, symlink ):
+    """Detects if the symlink points to the mountpoint.  If so, then no
+action is taken.  Otherwise, it creates the symlink"""
+    
 
 
 # Return the table as a dictionary key'd by host name.  The values of the
