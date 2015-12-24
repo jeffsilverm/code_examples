@@ -9,6 +9,7 @@ TYPE="TYPE"
 ENABLE="ENABLE"
 VOLUME="VOLUME"
 OPTIONS="OPTIONS"
+MOUNTPOINT="MOUNTPOINT"
 
 
 def get_table(filename):
@@ -23,11 +24,11 @@ NODE, ENABLE, TYPE, VOLUME, OPTIONS
     lines = contents.split("\n")
 # skip the line, which is a header
     for l in lines[1:] :
-        ( node, enable, fs_type, volume, options ) = l.split("\t")
+        ( node, enable, mountpoint, fs_type, volume, options ) = l.split("\t")
 # Return the table as a dictionary key'd by host name (NODE).  The values of the
 # dictionary are a dictionary with keys for enable, link, volume, and options        
-        d[node] = ( ENABLE: enable, TYPE: fs_type, VOLUME:volue, OPTIONS:option)
-   return d
+        d[node] = { ENABLE: enable, TYPE: fs_type, VOLUME:volue, OPTIONS:option }
+    return d
 
     
  
@@ -58,8 +59,7 @@ mountpoint."""
             raise ValueError("mountpoint %s exists and is not a directory") % \
                   mountpoint
     else :
-        
-    return  # mount point has been created
+        return  # mount point has been created
 
 def mount ( device, fs_type, mountpoint, options ):
     """Mounts device of file system type fs_type at mountpoint mountpoint,
