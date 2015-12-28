@@ -132,7 +132,7 @@ for node in table.keys():
                 umount( table[node][volume] )
                 log("Umounting %s\n" % table[node][volume] )
             else :
-                log("%s wasn't mounted, so do nothing\n" % table[node][VOLUME] )
+                log("%s wasn't mounted and enable was 'N', so do nothing\n" % table[node][VOLUME] )
         elif table[node][ENABLE] == "Y" :
 # do not assume that the mountpoint exists.  Since exist_ok is true, this call
 # will not throw an exception if the 
