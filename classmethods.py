@@ -25,9 +25,12 @@ class Thingy(object):
         """This method creates thingy objects"""
 
         cls._flavor = flavor
-        cls._class_serial_number = cls._class_serial_number
+        # _thingy_serial_number is unique for each thingy
+        cls._thingy_serial_number = cls._class_serial_number
         cls._thingy_list.append(cls)
         cls._name = name
+        print("Creating a Thingy object named {} ".format(name) +
+              " serial number {:d} ".format(cls._thingy_serial_number))
 
         cls._class_serial_number += 1
 
@@ -43,7 +46,7 @@ class Thingy(object):
     def __repr__(cls):
         """return a revisible representation of an object of type Thingy"""
         return "In class method __repr__:\n  flavor:{}".format(cls._flavor) + \
-            "\n  class serial number: {:d}".format(cls._class_serial_number) + \
+            "\n  class serial number: {:d}".format(cls._thingy_serial_number) + \
             "\n  class thingy list: {}".format(cls._thingy_list)
 
     @classmethod
@@ -70,6 +73,10 @@ class Thingy(object):
         """This method MUST be defined by any subclass"""
         raise NotImplemented("You didn't subclass the key_to_string method"\
                              "did you?")
+
+    @classmethod
+    def __repr__(self):
+        """This method """
 
 
 class GrayThingy(Thingy):
@@ -102,19 +109,28 @@ class GrayThingy(Thingy):
             super(Thingy, self).__init__()
 
     def __str__(self):
-        """This method converts an object of type GrayThingy to a string"""
-        s = "Instance: gray_scale: {} Instance: serial number {:d} name {}".\
-            format( self.key_to_string(self._flavor),
-                                self._class_serial_number, self._name )
+        """This method converts an object of type GrayThingy to a string.  The 
+        intent of this string is to be human readable"""
+        s = "Instance: gray_scale: {} {}\n  Instance: serial number " + \
+            "{:d} name {}".format( self._flavor, self.key_to_string(),
+            self._thingy_serial_number, self._name) + \
+            "\nThe class thingy_list is {}\n".format(super()._thingy_list)
         return s
 
     def __repr__(self):
-        return "In instance method __repr__:" + self.__str__()
+        w2 = "In GrayThingy instance method __repr__:\n" + \
+            "_obj_favor: {:d}\n".format(self._obj_flavor) + \
+            "_obj_serial_number: {:d}\n".format(self._obj_serial_number )
+        return w2
 
-    def key_to_string(self, key):
-        """This method converts a key to a gray value"""
-        return self.values_table[key]
 
+    def key_to_string(self, key=None):
+        """This method converts a key to a gray value.  If there was no argument
+         specified, then use the ._obj_flavor value"""
+        if key == None:
+            key = self._obj_flavor
+        q7 = self.values_table[key]
+        return q7
 
 class ColoredThingy(Thingy):
     RED = 0
@@ -146,9 +162,13 @@ class ColoredThingy(Thingy):
         else:
             super(Thingy, self).__init__()
 
-    def key_to_string(self, key):
-        """This method converts a key to a gray value"""
-        return self.colors_table[key]
+    def key_to_string(self, key=None):
+        """This method converts a key to a color value. If there was no argument
+        specified, then use the ._obj_flavor value"""
+        if key==None:
+            key = self._obj_flavor
+        q7 = self.colors_table[key]
+        return q7
 
 # Note that this class does *not* implement __str__.  What happens?
 
@@ -158,9 +178,10 @@ if __name__ == "__main__":
     red_thingy = ColoredThingy(ColoredThingy.RED, 'red')
     yellow_thingy = ColoredThingy(ColoredThingy.YELLOW, 'yellow')
     white_thingy = GrayThingy(GrayThingy.WHITE, 'white')
-    lightgray_thingy = GrayThingy(GrayThingy.LIGHTGRAY, 'light gray')
+    lightgray_thingy = GrayThingy(GrayThingy.LIGHTGRAY, 'light_gray')
     gray_thingy = GrayThingy(GrayThingy.GRAY, 'gray')
     black_thingy = GrayThingy(GrayThingy.BLACK, 'black')
+    violet_thingy = ColoredThingy(ColoredThingy.VIOLET, 'violet')
 
 
     print("The white thingy instance iterator")
@@ -169,6 +190,11 @@ if __name__ == "__main__":
         print(s)
         t=thingy._name
         print("Thingy name: {}".format(t) )
+        print(dir(thingy))
+        for tlm in thingy._thingy_list :
+            print(tlm)
+
+
 
     print("The Thingy class iterator")
     for thingy in Thingy.class_iterator():
