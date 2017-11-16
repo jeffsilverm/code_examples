@@ -15,11 +15,25 @@ import os
 import sys
 import termcolor as tc
 import subprocess
+import pwd
 
 
 cd = os.getcwd()
 hostname=os.uname()[1]
-username=os.getlogin()
+
+# os.getlogin doesn't work reliably.  If this program is invoked from a terminal
+# session started with Alt-T, then the os.getlogin() call fails with a file not
+# found exception.
+# This solution was suggested by https://github.com/parmentelat/apssh/issues/1
+
+
+try:
+    username=os.getlogin()
+except FileNotFoundError:
+# It clear to me that this will work under Windows, but then, the error might
+# not happen under windows, either.
+    username = pwd.getpwuid(os.getuid())[0]
+
 tc.cprint(username+"@"+hostname+":"+cd+" ", 'green', end=" ")
 
 
