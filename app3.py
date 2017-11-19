@@ -2,11 +2,14 @@
 #
 #
 # From https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
+# See also https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
+# Updated 18-Nov-2017 12:55 PM PST and again at 13:08 on branch development
 #
 from flask import Flask, jsonify
 from flask import abort
 from flask import make_response
 from flask import request
+from flask import render_template
 import sys
 
 
@@ -27,6 +30,14 @@ tasks = [
     }
 ]
 
+# This is from https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
+@app.route('/')
+@app.route('/index')
+def index():
+    user = {'nickname': 'Jeff'}  # fake user
+    return render_template('index.html',
+                           title='Home is substituted',
+                           user=user)
 
 @app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['GET'])
 def get_task(task_id):
@@ -55,17 +66,16 @@ def create_task():
 @app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
     for k in request.json.keys() :
-        print("request.json[%s] is %s and type %" % (k, request.json[k],
-                                                     type(request.json[k] )),
-              file=sys.stderr )
+        print("request.json[%s] is %s and type %" % (k, request.json[k], \
+                                type(request.json[k] )), file=sys.stderr )
     task = [task for task in tasks if task['id'] == task_id]
     if len(task) == 0:
         abort(404)
     if not request.json:
         abort(400)
-    if 'title' in request.json and type(request.json['title']) != unicode:
+    if 'title' in request.json and type(request.json['title']) != str:
         abort(400)
-    if 'description' in request.json and type(request.json['description']) is not unicode:
+    if 'description' in request.json and type(request.json['description']) is not str:
         abort(400)
     if 'done' in request.json and type(request.json['done']) is not bool:
         abort(400)
