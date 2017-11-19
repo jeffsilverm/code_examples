@@ -36,9 +36,6 @@ except FileNotFoundError:
 
 tc.cprint(username+"@"+hostname+":"+cd+" ", 'green', end=" ")
 
-
-
-
 completed = subprocess.run(["git", "status", "--porcelain"],
             stdin=None, input=None,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -69,10 +66,6 @@ if dirty:
   tc.cprint("* ", "red", end=" $ ")
 else:
   tc.cprint(" ", 'white', end=" $ ")
-
-
-
-
 
 
 
