@@ -29,7 +29,9 @@ hostname=os.uname()[1]
 
 try:
     username=os.getlogin()
-except FileNotFoundError:
+# The following fails under Python 2.7 and python 3.6 apparently is not built in
+# except FileNotFoundError:
+except OSError:
 # It clear to me that this will work under Windows, but then, the error might
 # not happen under windows, either.
     username = pwd.getpwuid(os.getuid())[0]
