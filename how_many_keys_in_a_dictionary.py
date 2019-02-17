@@ -10,7 +10,7 @@ d = dict()
 try:
     while True:
         if ctr % 1000000 == 0:		# Once every millionth count, let the world know
-            print(f"ctr is now {ctr}")
+            print(f"ctr is now {ctr:,d}")
         d[ctr] = random.randint(0, 0x7FFFFFFF)
         ctr += 1
 except Exception as e:
