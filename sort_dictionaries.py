@@ -37,5 +37,9 @@ print("ordered dictionary")
 for k in d.keys():
     print(f"d[{k}] is {d[k]}")
 
+print("ordered dictionary sorted")
+for k in sorted(d.keys()):
+    print(f"d[{k}] is {d[k]}")
+
 
 
