@@ -14,9 +14,15 @@ import sys
 from typing import List
 from typing import Tuple
 
-NUM_OF_RECORDS = 3
 NUM_OF_FIELDS = 4
+NUM_OF_RECORDS = 5
 LENGTH_OF_FIELD = 7
+if len(sys.argv) > 1:
+    NUM_OF_RECORDS = int(sys.argv[1])
+    if len(sys.argv) > 2:
+        NUM_OF_FIELDS = int(sys.argv[2])
+        if (len(sys.argv) ) > 3:
+            LENGTH_OF_FIELD = int(sys.argv[3])
 TABLE_NAME = "records_table"
 
 
@@ -130,7 +136,8 @@ def generate_list(num_fields: int, lof: int) -> List:
     for i in range(num_fields):
         # noinspection PyUnusedLocal
         random_string: str = \
-            ''.join(random.choice(string.printable) for j in range(lof))
+            ''.join(random.choice(string.printable.rstrip()) for j in range(
+                    lof))
         line.append(random_string)
     # lines.append(line)
     return line
