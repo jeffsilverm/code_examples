@@ -12,7 +12,6 @@ import string
 import mysql.connector
 import sys
 from typing import List
-from typing import Tuple
 
 NUM_OF_FIELDS = 4
 NUM_OF_RECORDS = 5
@@ -21,7 +20,7 @@ if len(sys.argv) > 1:
     NUM_OF_RECORDS = int(sys.argv[1])
     if len(sys.argv) > 2:
         NUM_OF_FIELDS = int(sys.argv[2])
-        if (len(sys.argv) ) > 3:
+        if (len(sys.argv)) > 3:
             LENGTH_OF_FIELD = int(sys.argv[3])
 TABLE_NAME = "records_table"
 
@@ -77,9 +76,15 @@ def execute_command(cursor: mysql.connector.cursor.MySQLCursor, command: str,
     """
     try:
         cursor.execute(command, args)
+    # There are some errors that the caller can catch an handle, such as
+    # dropping a table that's already dropped.
     except mysql.connector.errors.ProgrammingError as m:
         print(str(m), f"\nCommand was {command}\n", file=sys.stderr)
         raise
+    # This will catch anything that goes wrong
+    except Exception as e:
+        print(str(e), f"\nUNRECOVERABLE ERROR! Command was {command}\n",
+              file=sys.stderr)
 
 
 # noinspection PyUnresolvedReferences
@@ -127,8 +132,15 @@ def generate_list(num_fields: int, lof: int) -> List:
     -random-utf-8-string-in-python),
     I found a way to generate a string of all printable UTF-8 characters -
     what fun!
-    print(''.join(tuple(chr(i) for i in range(32, 0x110000) if chr(i).isprintable())))
-    random.sample(''.join(tuple(chr(i) for i in range(32, 0x110000) if chr(i).isprintable())), 1000)
+    # noinspection
+    print(''.join(tuple(chr(i) for i in range(32, 0x110000) if chr(
+    i).isprintable())))
+    random.sample(''.join(tuple(chr(i) for i in range(32, 0x110000) if chr(
+    i).isprintable())), 1000)
+    :param: int: num_fields    How many fields to put in a record
+    :param: int:    lof     Length of fields.  Each field has random ASCII
+    characters
+    :return:    list    list of {num_fields} strings, each {lof} characters
     """
     # db_lines = []
     # for i in range(num_recs):
@@ -152,7 +164,11 @@ def drop_table(cursor: mysql.connector.cursor.MySQLCursor) -> None:  # noqa
         execute_command(cursor, f"DROP TABLE {TABLE_NAME};")
     except mysql.connector.errors.ProgrammingError as q:
         if "Unknown table" not in str(q):
-            print(f"Something went horribly wrong when the table {TABLE_NAME} was dropped", file=sys.stderr)
+            print(
+                    f"Something went horribly wrong when the table "
+                    f"{TABLE_NAME} "
+                    f"was dropped",
+                    file=sys.stderr)
             raise
         else:
             print(f"Dropped a table that was already dropped.  Keep going.",
@@ -174,9 +190,19 @@ def populate_table(cursor: mysql.connector.cursor.MySQLCursor,
     """
     # Storing millions of lines of text in RAM sounds like a
     # recipe for page faulting.
-    column_tpl = tuple(column_names)
     template = (num_of_fields - 1) * ", %s"
+    begin_end_flag = False
+    # noinspection SqlNoDataSourceInspection
+    execute_command(cursor=cursor, command="SET autocommit = 1; ")
     for line in range(num_of_records):
+        # The trick of wrapping a lot of INSERTS with BEGIN and END comes from
+        # https://mariadb.com/kb/en/library/how-to-quickly-insert-data-into
+        # -mariadb/
+        # and has to do with reducing the size of the transaction log
+        begin_end_flag = (line % 1000 == 0)
+        if begin_end_flag:
+            # noinspection SqlNoDataSourceInspection
+            execute_command(cursor=cursor, command="BEGIN WORK;")
         db_line: List[str] = generate_list(num_fields=num_of_fields,
                                            lof=length_of_field)
         # noinspection SqlNoDataSourceInspection
@@ -184,13 +210,26 @@ def populate_table(cursor: mysql.connector.cursor.MySQLCursor,
                          ", ".join(column_names) + ") VALUES ( %s " \
                          + template + ");"
         execute_command(cursor=cursor, command=insert_command, args=db_line)
-
+        if begin_end_flag:
+            execute_command(cursor=cursor, command="COMMIT;")
+    # If the END command was not done just before exiting the loop, then do
+    # it here because otherwise the transacation will be open when it gets
+    # committed
+    if not begin_end_flag:
+        try:
+            print("At last COMMIT; before commit", file=sys.stderr)
+            execute_command(cursor=cursor, command="COMMIT;")
+        except mysql.connector.errors.ProgrammingError as p:
+            print("The last COMMIT; raised a "
+                  "mysql.connector.errors.ProgrammingError, ignoring.  "
+                  f"{str(p)}",
+                  file=sys.stderr)
     # Make sure data is committed to the database
     cnx_.commit()
 
 
 def main(num_of_records: int = NUM_OF_RECORDS, num_of_fields:
-int = NUM_OF_FIELDS,
+         int = NUM_OF_FIELDS,
          length_of_field: int = LENGTH_OF_FIELD) -> None:
     """Create a connection to the database
     """
@@ -213,3 +252,8 @@ int = NUM_OF_FIELDS,
 if "__main__" == __name__:
     main(num_of_records=NUM_OF_RECORDS, num_of_fields=NUM_OF_FIELDS,
          length_of_field=LENGTH_OF_FIELD)
+
+# Note: if you get compile time warnings that are actually acceptable,
+# then read
+# https://intellij-support.jetbrains.com/hc/en-us/community/posts/205816889
+# -Disable-individual-PEP8-style-checking-line-length-
