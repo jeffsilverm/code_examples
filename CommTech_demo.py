@@ -4,7 +4,8 @@
 
 """
 This program times how long it takes to load a large number of long CSV
-records in a database"""
+records in a database
+"""
 
 import random
 import string
